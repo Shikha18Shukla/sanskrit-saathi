@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sanskrit Saathi – AI study companion for Sanskrit &amp; Ayurveda</title>
+<meta name="description" content="An AI-powered Sanskrit learning companion designed for BAMS students.">
+<style>
+:root{
+  --ivory:#FAF5E9; --paper:#FFFDF7; --line:#E3D8BF;
+  --green:#1F4B3A; --green-d:#163829; --green-t:#E4EEE6;
+  --gold:#A8731A; --gold-t:#F6E9C9; --ink:#2B2620; --muted:#6A6052;
+  --err:#8A2F1E; --err-t:#F8E7E1;
+  --serif:Georgia,"Iowan Old Style","Palatino Linotype",serif;
+  --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --deva:"Noto Serif Devanagari","Kohinoor Devanagari","Nirmala UI",Mangal,"Sanskrit Text",serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--ivory);color:var(--ink);font:1rem/1.65 var(--sans)}
+.wrap{max-width:820px;margin:0 auto;padding:0 20px}
+:focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--green);color:#fff;padding:8px 14px;border-radius:6px;z-index:9}
+.skip:focus{left:8px}
+
+header.top{border-bottom:1px solid var(--line);background:var(--paper)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;flex-wrap:wrap}
+.brand{font:700 1.25rem var(--serif);color:var(--green);letter-spacing:.2px}
+.badge{font-size:.82rem;color:var(--gold);background:var(--gold-t);border:1px solid #E5CF98;padding:3px 12px;border-radius:999px;font-weight:600}
+
+.hero{padding:44px 0 26px}
+.hero h1{font:700 clamp(2rem,5.5vw,3.1rem)/1.15 var(--serif);color:var(--green-d);margin:0 0 14px;max-width:16em}
+.hero .tag{margin:0 0 6px;font:italic 1.1rem var(--serif);color:var(--gold)}
+.hero p.sub{margin:0;color:var(--muted);max-width:36em}
+
+.panel{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--green);border-radius:10px;padding:22px;box-shadow:0 1px 2px rgba(60,40,10,.06)}
+label.field{display:block;font-weight:600;color:var(--green-d);margin-bottom:8px}
+textarea{width:100%;min-height:150px;resize:vertical;padding:16px 18px;font:1.45rem/1.7 var(--deva);color:var(--ink);background:var(--ivory);border:1.5px solid var(--line);border-radius:8px;transition:border-color .15s,background .15s}
+textarea::placeholder{font:1rem var(--sans);color:#7A705F}
+textarea:hover{border-color:#CBBB95}
+textarea:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(31,75,58,.18)}
+.meta{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:.85rem;color:var(--muted)}
+
+.mode{margin:16px 0 0;padding:0;border:0;min-width:0}
+.mode legend{padding:0;font-weight:600;color:var(--green-d);font-size:.95rem;margin-bottom:6px}
+.seg{display:inline-flex;background:var(--ivory);border:1.5px solid var(--line);border-radius:8px;padding:3px;gap:3px;max-width:100%}
+.seg label{position:relative;cursor:pointer;display:block}
+.seg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
+.seg span{display:block;padding:8px 16px;border-radius:6px;font-weight:600;font-size:.95rem;color:var(--muted);transition:background .15s,color .15s;white-space:nowrap}
+.seg label:hover span{background:var(--gold-t);color:var(--green-d)}
+.seg input:checked+span{background:var(--green);color:#fff}
+.seg input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
+.mode .help{margin:8px 0 0;font-size:.85rem;color:var(--muted)}
+.mode .bams-note{margin:2px 0 0;font-size:.85rem;color:var(--gold);font-weight:600}
+@media(max-width:480px){.seg{display:flex;width:100%}.seg label{flex:1}.seg span{text-align:center;padding:10px 8px;white-space:normal}}
+.actions{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
+.btn{font:600 1rem var(--sans);padding:12px 24px;border-radius:8px;cursor:pointer;border:2px solid var(--green);transition:background .15s,color .15s,transform .15s;min-height:48px}
+.btn:active:not(:disabled){transform:translateY(1px)}
+.btn.primary{background:var(--green);color:#fff}
+.btn.primary:hover:not(:disabled){background:var(--green-d)}
+.btn.secondary{background:var(--gold-t);color:var(--green-d);border-color:var(--gold)}
+.btn.secondary:hover:not(:disabled){background:#F0DDAE}
+.btn:disabled{opacity:.55;cursor:not-allowed}
+@media(max-width:480px){.btn{flex:1 1 100%}}
+
+.examples{margin-top:20px;padding-top:16px;border-top:1px dashed var(--line)}
+.examples h2{font:600 .95rem var(--sans);color:var(--muted);margin:0 0 10px}
+.chips{display:flex;gap:10px;flex-wrap:wrap}
+.chip{font:1.1rem var(--deva);background:#fff;color:var(--green-d);border:1px solid var(--line);padding:6px 14px;border-radius:8px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
+.chip:hover{border-color:var(--gold);background:var(--gold-t)}
+
+#status{margin-top:28px}
+.loading,.error{border-radius:10px;padding:22px;display:flex;gap:16px;align-items:flex-start}
+.loading{background:var(--green-t);border:1px solid #C5D9CB}
+.loading strong,.error strong{display:block;font:700 1.1rem var(--serif);color:var(--green-d)}
+.loading span{color:var(--muted)}
+.spin{flex:none;width:26px;height:26px;border:3px solid #BFD3C5;border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite;margin-top:2px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{background:var(--err-t);border:1px solid #E6BDB0}
+.error strong{color:var(--err)}
+.error p{margin:4px 0 0}
+
+.card{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(60,40,10,.06)}
+.card>header{display:flex;align-items:center;gap:10px;padding:14px 22px;background:var(--green);color:#fff}
+.card>header h2{margin:0;font:700 1.2rem var(--serif)}
+.card.quiz>header{background:var(--gold);}
+.card.quiz>header h2{color:#fff}
+.sec{padding:18px 22px;border-top:1px solid var(--line)}
+.sec:first-of-type{border-top:0}
+.sec h3{margin:0 0 8px;font:700 1.02rem var(--serif);color:var(--green-d)}
+.sec.sa .body{font:1.6rem/1.8 var(--deva);color:var(--ink)}
+.body p{margin:0 0 .6em}
+.body p:last-child{margin-bottom:0}
+.body ul{margin:.2em 0 .4em;padding-left:1.3em}
+.body li{margin:.25em 0}
+.sec.warn{background:var(--gold-t)}
+.plain{padding:20px 22px}
+.quiz .plain{font-size:1.05rem}
+.quiz .plain p{margin:0 0 .9em}
+.disclaimer{margin:0;padding:12px 22px;font-size:.85rem;color:var(--muted);background:var(--ivory);border-top:1px solid var(--line)}
+
+footer{margin-top:56px;padding:26px 0 36px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
+footer p{margin:2px 0}
+footer .b{font-weight:600;color:var(--green)}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:2.5s!important}}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+
+<header class="top">
+  <div class="wrap bar">
+    <div class="brand">🌿 Sanskrit Saathi</div>
+    <span class="badge">BAMS Sanskrit Study Companion</span>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+  <section class="hero" aria-labelledby="hero-title">
+    <p class="tag">Your AI study companion for Sanskrit &amp; Ayurveda</p>
+    <h1 id="hero-title">Understand Sanskrit. Learn Ayurveda. Study smarter.</h1>
+    <p class="sub">An AI-powered Sanskrit learning companion designed for BAMS students.</p>
+  </section>
+
+  <section class="panel" aria-label="Sanskrit input">
+    <label class="field" for="text">Your Sanskrit text</label>
+    <textarea id="text" lang="sa" placeholder="Paste a Sanskrit word, sentence, or shloka here..." aria-describedby="count"></textarea>
+    <div class="meta"><span>Tip: press Ctrl + Enter to explain</span><span id="count" aria-live="off">0 characters</span></div>
+
+    <fieldset class="mode" aria-describedby="modeHelp">
+      <legend>Study mode</legend>
+      <div class="seg">
+        <label><input type="radio" name="study_mode" value="general" checked><span>🌿 General Sanskrit</span></label>
+        <label><input type="radio" name="study_mode" value="bams"><span>🪷 BAMS Sanskrit</span></label>
+      </div>
+      <p class="help" id="modeHelp">Choose how Sanskrit Saathi should explain your text.</p>
+      <p class="bams-note" id="bamsNote" hidden>Focused on Sanskrit learning in a BAMS/Ayurveda study context.</p>
+    </fieldset>
+
+    <div class="actions">
+      <button type="button" id="explainBtn" class="btn primary">📖 Explain This</button>
+      <button type="button" id="quizBtn" class="btn secondary">🧠 Quiz Me</button>
+    </div>
+
+    <div class="examples">
+      <h2 id="ex-h">Try an example</h2>
+      <div class="chips" role="group" aria-labelledby="ex-h">
+        <button type="button" class="chip" lang="sa" data-text="आयुः">आयुः</button>
+        <button type="button" class="chip" lang="sa" data-text="कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।</button>
+      </div>
+    </div>
+  </section>
+
+  <div id="status" aria-live="polite"></div>
+  <div id="results"></div>
+</main>
+
+<footer>
+  <div class="wrap">
+    <p class="b">Built with Flask + Ollama + Gemma</p>
+    <p>Designed for learning Sanskrit with open-weight AI.</p>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var textEl=document.getElementById("text"),
+      countEl=document.getElementById("count"),
+      statusEl=document.getElementById("status"),
+      resultsEl=document.getElementById("results"),
+      explainBtn=document.getElementById("explainBtn"),
+      quizBtn=document.getElementById("quizBtn");
+
+  var selectedStudyMode="general",
+      bamsNote=document.getElementById("bamsNote");
+  document.querySelectorAll('input[name="study_mode"]').forEach(function(r){
+    r.addEventListener("change",function(){
+      if(r.checked){
+        selectedStudyMode=(r.value==="bams")?"bams":"general";
+        bamsNote.hidden=selectedStudyMode!=="bams";
+      }
+    });
+  });
+
+  function updateCount(){
+    var n=textEl.value.length;
+    countEl.textContent=n+(n===1?" character":" characters");
+  }
+  textEl.addEventListener("input",updateCount);
+  textEl.addEventListener("keydown",function(e){
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();explain();}
+  });
+  document.querySelectorAll(".chip").forEach(function(c){
+    c.addEventListener("click",function(){
+      textEl.value=c.getAttribute("data-text");
+      updateCount();textEl.focus();
+    });
+  });
+
+  /* ---------- small DOM helpers (text is always inserted as textContent) ---------- */
+  function el(tag,cls,txt){
+    var n=document.createElement(tag);
+    if(cls)n.className=cls;
+    if(txt!=null)n.textContent=txt;
+    return n;
+  }
+  function inline(parent,str){           // supports **bold** only
+    str.split(/(\*\*[^*]+\*\*)/).forEach(function(p){
+      if(!p)return;
+      if(/^\*\*[^*]+\*\*$/.test(p))parent.appendChild(el("strong",null,p.slice(2,-2)));
+      else parent.appendChild(document.createTextNode(p.replace(/\*\*/g,"")));
+    });
+  }
+  function renderBody(lines){            // paragraphs + simple bullet lists
+    var box=el("div","body"),ul=null;
+    lines.forEach(function(raw){
+      var line=raw.replace(/\s+$/,"");
+      if(!line.trim()){ul=null;return;}
+      var m=line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
+      if(m&&/^\s*[-*•]/.test(line)){
+        if(!ul){ul=el("ul");box.appendChild(ul);}
+        var li=el("li");inline(li,m[1]);ul.appendChild(li);
+      }else{
+        ul=null;
+        var p=el("p");inline(p,line.trim());box.appendChild(p);
+      }
+    });
+    return box;
+  }
+
+  /* ---------- explanation: safely parse obvious numbered sections ---------- */
+  var META=[
+    [/original|sanskrit text|devanagari/i,"📜"],
+    [/transliterat|roman|iast/i,"🔤"],
+    [/english/i,"🇬🇧"],
+    [/hindi|हिन्दी|हिंदी/i,"🇮🇳"],
+    [/word|breakdown|grammar/i,"🧩"],
+    [/context|usage|example|application/i,"📚"],
+    [/note|tip|caution|remember|learning/i,"⚠️"]
+  ];
+  function metaFor(title){
+    for(var i=0;i<META.length;i++)if(META[i][0].test(title))return META[i][1];
+    return "🌿";
+  }
+  function parseSections(text){
+    var head=/^\s*(?:#{1,4}\s*)?(?:\*\*)?\s*(\d{1,2})[.)]\s*(.+)$/;
+    var secs=[],cur=null,pre=[];
+    text.split(/\r?\n/).forEach(function(line){
+      var m=line.match(head);
+      if(m){
+        var rest=m[2].replace(/\*\*/g,"").trim(),title=rest,body="";
+        var ci=rest.indexOf(":");
+        if(ci>0&&ci<60){title=rest.slice(0,ci).trim();body=rest.slice(ci+1).trim();}
+        else if(rest.length>60){title="Section "+m[1];body=rest;}
+        cur={title:title.replace(/[:\s]+$/,""),lines:body?[body]:[]};
+        secs.push(cur);
+      }else if(cur)cur.lines.push(line);
+      else pre.push(line);
+    });
+    return secs.length>=2?{secs:secs,pre:pre}:null;
+  }
+
+  function buildCard(cls,title,icon){
+    var card=el("article","card "+cls);
+    var h=el("header");h.appendChild(el("span",null,icon));h.appendChild(el("h2",null,title));
+    card.appendChild(h);
+    return card;
+  }
+  function showExplanation(answer){
+    var card=buildCard("explain","Explanation","📖");
+    var parsed=parseSections(answer);
+    if(parsed){
+      if(parsed.pre.join("").trim()){
+        var intro=el("section","sec");intro.appendChild(renderBody(parsed.pre));card.appendChild(intro);
+      }
+      parsed.secs.forEach(function(s){
+        if(!s.lines.join("").trim())return;
+        var sec=el("section","sec");
+        if(/original|sanskrit text|devanagari/i.test(s.title))sec.classList.add("sa");
+        if(/note|caution|learning/i.test(s.title))sec.classList.add("warn");
+        sec.appendChild(el("h3",null,metaFor(s.title)+" "+s.title));
+        var body=renderBody(s.lines);
+        if(sec.classList.contains("sa"))body.setAttribute("lang","sa");
+        sec.appendChild(body);
+        card.appendChild(sec);
+      });
+    }else{
+      var plain=el("div","plain");plain.appendChild(renderBody(answer.split(/\r?\n/)));card.appendChild(plain);
+    }
+    card.appendChild(el("p","disclaimer","Sanskrit Saathi is a language-learning aid. Check important meanings with your textbook or teacher."));
+    return card;
+  }
+  function showQuiz(quiz){
+    var card=buildCard("quiz","Sanskrit Quiz","🧠");
+    var plain=el("div","plain");plain.appendChild(renderBody(quiz.split(/\r?\n/)));
+    card.appendChild(plain);
+    return card;
+  }
+
+  /* ---------- request flow ---------- */
+  function setBusy(busy,which){
+    explainBtn.disabled=busy;quizBtn.disabled=busy;
+    explainBtn.setAttribute("aria-busy",busy&&which==="explain");
+    quizBtn.setAttribute("aria-busy",busy&&which==="quiz");
+  }
+  function showLoading(title,sub){
+    statusEl.textContent="";
+    var box=el("div","loading");box.setAttribute("role","status");
+    box.appendChild(el("div","spin"));
+    var t=el("div");t.appendChild(el("strong",null,title));t.appendChild(el("span",null,sub));
+    box.appendChild(t);statusEl.appendChild(box);
+  }
+  function showError(msg){
+    statusEl.textContent="";
+    var box=el("div","error");box.setAttribute("role","alert");
+    box.appendChild(el("span",null,"⚠️"));
+    var t=el("div");t.appendChild(el("strong",null,"Something went wrong"));t.appendChild(el("p",null,msg));
+    box.appendChild(t);statusEl.appendChild(box);
+  }
+  var CONNECT_MSG="Something went wrong while connecting to Sanskrit Saathi. Please make sure Ollama is running and try again.";
+
+  function run(kind){
+    var text=textEl.value.trim();
+    if(!text){
+      showError("Please enter or paste some Sanskrit text first, or pick one of the examples.");
+      textEl.focus();return;
+    }
+    var isExplain=kind==="explain";
+    setBusy(true,kind);
+    resultsEl.textContent="";
+    if(isExplain)showLoading("🌿 Sanskrit Saathi is thinking...","Your local AI is preparing your explanation.");
+    else showLoading("🧠 Creating your Sanskrit quiz...","Your local AI is writing questions from your text.");
+
+    fetch(isExplain?"/api/explain":"/api/quiz",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({text:text,study_mode:selectedStudyMode})
+    })
+    .then(function(r){
+      if(!r.ok)throw new Error("HTTP "+r.status);
+      return r.json();
+    })
+    .then(function(data){
+      var out=isExplain?data.answer:data.quiz;
+      if(typeof out!=="string"||!out.trim())throw new Error("Empty response");
+      statusEl.textContent="";
+      var card=isExplain?showExplanation(out):showQuiz(out);
+      resultsEl.appendChild(card);
+      card.scrollIntoView({behavior:"smooth",block:"start"});
+    })
+    .catch(function(err){
+      console.error("Sanskrit Saathi request failed:",err);
+      showError(CONNECT_MSG);
+    })
+    .then(function(){setBusy(false);});
+  }
+  function explain(){if(!explainBtn.disabled)run("explain");}
+  explainBtn.addEventListener("click",function(){run("explain");});
+  quizBtn.addEventListener("click",function(){run("quiz");});
+  updateCount();
+})();
+</script>
+</body>
+</html>
