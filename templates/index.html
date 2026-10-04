@@ -3,156 +3,230 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Sanskrit Saathi – AI study companion for Sanskrit &amp; Ayurveda</title>
+<title>Sanskrit Saathi – Your Sanskrit study companion</title>
 <meta name="description" content="An AI-powered Sanskrit learning companion designed for BAMS students.">
 <style>
 :root{
-  --ivory:#FAF5E9; --paper:#FFFDF7; --line:#E3D8BF;
-  --green:#1F4B3A; --green-d:#163829; --green-t:#E4EEE6;
-  --gold:#A8731A; --gold-t:#F6E9C9; --ink:#2B2620; --muted:#6A6052;
-  --err:#8A2F1E; --err-t:#F8E7E1;
+  --ivory:#FAF5E9;--paper:#FFFCF5;--beige:#F3EBD6;--line:#E4D9C0;
+  --green:#2A5642;--green-d:#1B3B2D;--sage:#6F8F78;--sage-t:#E8F0E9;
+  --gold:#946512;--gold-t:#F6E9C9;--gold-l:#E3CC94;
+  --terra:#A64B2F;--terra-t:#F7E5DD;
+  --ink:#26302A;--muted:#645B4D;--err:#8A2F1E;--err-t:#F8E7E1;
   --serif:Georgia,"Iowan Old Style","Palatino Linotype",serif;
   --sans:system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
   --deva:"Noto Serif Devanagari","Kohinoor Devanagari","Nirmala UI",Mangal,"Sanskrit Text",serif;
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
-body{margin:0;background:var(--ivory);color:var(--ink);font:1rem/1.65 var(--sans)}
-.wrap{max-width:820px;margin:0 auto;padding:0 20px}
+body{margin:0;background:var(--ivory);color:var(--ink);font:1rem/1.6 var(--sans);overflow-x:hidden}
+button{font-family:inherit}
 :focus-visible{outline:3px solid var(--gold);outline-offset:2px;border-radius:4px}
-.skip{position:absolute;left:-999px;top:8px;background:var(--green);color:#fff;padding:8px 14px;border-radius:6px;z-index:9}
+.wrap{max-width:780px;margin:0 auto;padding:0 18px}
+.skip{position:absolute;left:-999px;top:8px;background:var(--green);color:#fff;padding:8px 14px;border-radius:6px;z-index:20}
 .skip:focus{left:8px}
+header.top,main,footer{position:relative;z-index:1}
 
-header.top{border-bottom:1px solid var(--line);background:var(--paper)}
-.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 0;flex-wrap:wrap}
-.brand{font:700 1.25rem var(--serif);color:var(--green);letter-spacing:.2px}
-.badge{font-size:.82rem;color:var(--gold);background:var(--gold-t);border:1px solid #E5CF98;padding:3px 12px;border-radius:999px;font-weight:600}
+.glyphs{position:fixed;inset:0;overflow:hidden;pointer-events:none;z-index:0}
+.glyphs span{position:absolute;left:var(--x);top:var(--y);font:var(--s)/1 var(--deva);color:var(--green);opacity:.055;animation:drift var(--d) ease-in-out infinite alternate}
+@keyframes drift{from{transform:translate(0,0) rotate(-4deg)}to{transform:translate(20px,-28px) rotate(4deg)}}
 
-.hero{padding:44px 0 26px}
-.hero h1{font:700 clamp(2rem,5.5vw,3.1rem)/1.15 var(--serif);color:var(--green-d);margin:0 0 14px;max-width:16em}
-.hero .tag{margin:0 0 6px;font:italic 1.1rem var(--serif);color:var(--gold)}
-.hero p.sub{margin:0;color:var(--muted);max-width:36em}
+header.top{background:var(--paper);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 18px}
+.brand{font:700 1.15rem/1.2 var(--serif);color:var(--green)}
+.sub{font-size:.78rem;color:var(--muted)}
+.mode-ind{font-size:.8rem;font-weight:600;color:var(--green-d);background:var(--sage-t);border:1px solid #CADBCD;padding:4px 12px;border-radius:999px;white-space:nowrap;transition:background .25s,color .25s}
+.mode-ind.bams{background:var(--gold-t);border-color:var(--gold-l);color:var(--gold)}
 
-.panel{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--green);border-radius:10px;padding:22px;box-shadow:0 1px 2px rgba(60,40,10,.06)}
-label.field{display:block;font-weight:600;color:var(--green-d);margin-bottom:8px}
-textarea{width:100%;min-height:150px;resize:vertical;padding:16px 18px;font:1.45rem/1.7 var(--deva);color:var(--ink);background:var(--ivory);border:1.5px solid var(--line);border-radius:8px;transition:border-color .15s,background .15s}
-textarea::placeholder{font:1rem var(--sans);color:#7A705F}
+.app{max-width:780px;margin:0 auto;padding:0 18px}
+.app.has-results{max-width:1120px}
+@media(min-width:1000px){.app.has-results{display:grid;grid-template-columns:400px minmax(0,1fr);gap:24px;align-items:start}}
+.intro{padding:24px 0 14px}
+.eyebrow{margin:0 0 4px;font:700 .72rem var(--sans);letter-spacing:.14em;color:var(--terra)}
+.intro h1{margin:0 0 6px;font:700 clamp(1.7rem,4.2vw,2.4rem)/1.2 var(--serif);color:var(--green-d)}
+.intro p{margin:0;color:var(--muted)}
+
+.panel{background:var(--paper);border:1px solid var(--line);border-top:4px solid var(--green);border-radius:14px;padding:18px 20px 20px;box-shadow:0 1px 3px rgba(60,40,10,.07);transition:border-top-color .3s}
+.panel:focus-within{border-top-color:var(--gold)}
+.panel h2{margin:0 0 10px;font:700 1.05rem var(--serif);color:var(--green-d)}
+.panel h2 b{color:var(--terra);font-weight:400}
+textarea{display:block;width:100%;min-height:112px;resize:vertical;padding:12px 14px;font:1.35rem/1.65 var(--deva);color:var(--ink);background:var(--ivory);border:1.5px solid var(--line);border-radius:10px;transition:border-color .2s,background .2s,box-shadow .25s}
+textarea::placeholder{font:.98rem var(--sans);color:#756B59}
 textarea:hover{border-color:#CBBB95}
-textarea:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 3px rgba(31,75,58,.18)}
-.meta{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:.85rem;color:var(--muted)}
+textarea:focus{outline:none;border-color:var(--green);background:#fff;box-shadow:0 0 0 4px rgba(42,86,66,.15)}
+.meta{display:flex;justify-content:space-between;gap:10px;margin-top:6px;font-size:.82rem;color:var(--muted)}
 
-.mode{margin:16px 0 0;padding:0;border:0;min-width:0}
-.mode legend{padding:0;font-weight:600;color:var(--green-d);font-size:.95rem;margin-bottom:6px}
-.seg{display:inline-flex;background:var(--ivory);border:1.5px solid var(--line);border-radius:8px;padding:3px;gap:3px;max-width:100%}
-.seg label{position:relative;cursor:pointer;display:block}
+.mode{margin:14px 0 0;padding:0;border:0;min-width:0}
+.mode legend{padding:0;font-weight:600;color:var(--green-d);font-size:.88rem;margin-bottom:6px}
+.seg{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;background:var(--beige);border:1.5px solid var(--line);border-radius:11px;padding:3px;max-width:100%}
+.seg::before{content:"";position:absolute;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);background:var(--green);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.2);transition:transform .28s cubic-bezier(.3,.8,.3,1)}
+.seg[data-mode="bams"]::before{transform:translateX(100%)}
+.seg label{position:relative;z-index:1;cursor:pointer;display:block}
 .seg input{position:absolute;opacity:0;inset:0;width:100%;height:100%;margin:0;cursor:pointer}
-.seg span{display:block;padding:8px 16px;border-radius:6px;font-weight:600;font-size:.95rem;color:var(--muted);transition:background .15s,color .15s;white-space:nowrap}
-.seg label:hover span{background:var(--gold-t);color:var(--green-d)}
-.seg input:checked+span{background:var(--green);color:#fff}
-.seg input:focus-visible+span{outline:3px solid var(--gold);outline-offset:2px}
-.mode .help{margin:8px 0 0;font-size:.85rem;color:var(--muted)}
-.mode .bams-note{margin:2px 0 0;font-size:.85rem;color:var(--gold);font-weight:600}
-@media(max-width:480px){.seg{display:flex;width:100%}.seg label{flex:1}.seg span{text-align:center;padding:10px 8px;white-space:normal}}
-.actions{display:flex;gap:12px;margin-top:16px;flex-wrap:wrap}
-.btn{font:600 1rem var(--sans);padding:12px 24px;border-radius:8px;cursor:pointer;border:2px solid var(--green);transition:background .15s,color .15s,transform .15s;min-height:48px}
-.btn:active:not(:disabled){transform:translateY(1px)}
-.btn.primary{background:var(--green);color:#fff}
+.seg span{display:block;padding:8px 16px;border-radius:8px;font-weight:600;font-size:.92rem;color:var(--muted);text-align:center;white-space:nowrap;transition:color .25s}
+.seg label:hover span{color:var(--green-d)}
+.seg input:checked+span,.seg label:hover input:checked+span{color:#fff}
+.seg input:focus-visible+span{outline:3px solid var(--gold);outline-offset:1px}
+.mode .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:8px}
+.help{margin:0;font-size:.82rem;color:var(--muted)}
+.pill{font-size:.72rem;font-weight:700;color:var(--gold);background:var(--gold-t);border:1px solid var(--gold-l);padding:0 9px;border-radius:999px}
+.pill:not([hidden]){animation:pop .25s ease-out}
+
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.btn{font-weight:600;font-size:.98rem;padding:11px 26px;border-radius:10px;cursor:pointer;border:2px solid var(--green);min-height:46px;transition:background .2s,color .2s,transform .15s,box-shadow .2s,border-color .2s}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:active:not(:disabled){transform:translateY(1px);box-shadow:none}
+.btn.primary{background:var(--green);color:#fff;box-shadow:0 3px 8px rgba(42,86,66,.25)}
 .btn.primary:hover:not(:disabled){background:var(--green-d)}
-.btn.secondary{background:var(--gold-t);color:var(--green-d);border-color:var(--gold)}
-.btn.secondary:hover:not(:disabled){background:#F0DDAE}
+.btn.secondary{background:var(--paper);color:var(--green-d);border-color:var(--gold)}
+.btn.secondary:hover:not(:disabled){background:var(--gold-t);border-color:var(--terra)}
 .btn:disabled{opacity:.55;cursor:not-allowed}
-@media(max-width:480px){.btn{flex:1 1 100%}}
 
-.examples{margin-top:20px;padding-top:16px;border-top:1px dashed var(--line)}
-.examples h2{font:600 .95rem var(--sans);color:var(--muted);margin:0 0 10px}
-.chips{display:flex;gap:10px;flex-wrap:wrap}
-.chip{font:1.1rem var(--deva);background:#fff;color:var(--green-d);border:1px solid var(--line);padding:6px 14px;border-radius:8px;cursor:pointer;text-align:left;transition:border-color .15s,background .15s}
-.chip:hover{border-color:var(--gold);background:var(--gold-t)}
+.practice{margin-top:18px;padding-top:14px;border-top:1px dashed var(--line)}
+.practice h3{margin:0 0 8px;font:700 .8rem var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{font:1.08rem/1.4 var(--deva);background:var(--sage-t);color:var(--green-d);border:1px solid #CADBCD;padding:6px 16px;border-radius:999px;cursor:pointer;transition:background .2s,border-color .2s,transform .15s}
+.chip:hover{background:var(--gold-t);border-color:var(--gold);transform:translateY(-2px)}
+.chip:active{transform:scale(.95)}
 
-#status{margin-top:28px}
-.loading,.error{border-radius:10px;padding:22px;display:flex;gap:16px;align-items:flex-start}
-.loading{background:var(--green-t);border:1px solid #C5D9CB}
-.loading strong,.error strong{display:block;font:700 1.1rem var(--serif);color:var(--green-d)}
-.loading span{color:var(--muted)}
-.spin{flex:none;width:26px;height:26px;border:3px solid #BFD3C5;border-top-color:var(--green);border-radius:50%;animation:spin 1s linear infinite;margin-top:2px}
-@keyframes spin{to{transform:rotate(360deg)}}
-.error{background:var(--err-t);border:1px solid #E6BDB0}
-.error strong{color:var(--err)}
-.error p{margin:4px 0 0}
+.out{min-width:0}
+#status:not(:empty){margin-top:18px}
+.loading,.error{border-radius:12px;padding:16px 18px;display:flex;gap:14px;align-items:center}
+.loading{background:var(--sage-t);border:1px solid #CADBCD}
+.loading strong,.error strong{display:block;font:700 1.05rem var(--serif);color:var(--green-d)}
+.loading span{color:var(--muted);font-size:.92rem}
+.glyph{flex:none;font:2.1rem/1 var(--deva);color:var(--green);animation:pulse 1.6s ease-in-out infinite}
+.dots{display:inline-block;margin-left:8px}
+.dots i{display:inline-block;width:5px;height:5px;margin-right:3px;border-radius:50%;background:var(--green);animation:blink 1.2s infinite both}
+.dots i:nth-child(2){animation-delay:.2s}.dots i:nth-child(3){animation-delay:.4s}
+.error{background:var(--err-t);border:1px solid #E6BDB0;align-items:flex-start}
+.error strong{color:var(--err)}.error p{margin:4px 0 0}
+@keyframes pulse{0%,100%{opacity:.4;transform:scale(.92)}50%{opacity:1;transform:scale(1.06)}}
+@keyframes blink{0%,80%,100%{opacity:.2}40%{opacity:1}}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+@keyframes pop{from{opacity:0;transform:scale(.9)}to{opacity:1;transform:none}}
 
-.card{margin-top:28px;background:var(--paper);border:1px solid var(--line);border-radius:10px;overflow:hidden;box-shadow:0 1px 2px rgba(60,40,10,.06)}
-.card>header{display:flex;align-items:center;gap:10px;padding:14px 22px;background:var(--green);color:#fff}
-.card>header h2{margin:0;font:700 1.2rem var(--serif)}
-.card.quiz>header{background:var(--gold);}
-.card.quiz>header h2{color:#fff}
-.sec{padding:18px 22px;border-top:1px solid var(--line)}
-.sec:first-of-type{border-top:0}
-.sec h3{margin:0 0 8px;font:700 1.02rem var(--serif);color:var(--green-d)}
-.sec.sa .body{font:1.6rem/1.8 var(--deva);color:var(--ink)}
-.body p{margin:0 0 .6em}
+.card{margin-top:18px;background:var(--paper);border:1px solid var(--line);border-radius:14px;overflow:hidden;box-shadow:0 1px 3px rgba(60,40,10,.07);animation:rise .3s ease-out;padding-bottom:14px}
+.app.has-results .card{margin-top:24px}
+@media(min-width:1000px){.app.has-results .card{margin-top:0}.app.has-results .intro{padding-top:24px}}
+.card>header{display:flex;align-items:center;gap:10px;padding:12px 18px;background:var(--green);color:#fff;flex-wrap:wrap;margin-bottom:2px}
+.card>header h2{margin:0;font:700 1.15rem var(--serif);flex:1}
+.card.quiz>header{background:var(--gold)}
+.ready{font-size:.76rem;font-weight:600;background:rgba(255,255,255,.18);padding:2px 10px;border-radius:999px}
+.card>header .copy{background:rgba(255,255,255,.14);color:#fff;border-color:rgba(255,255,255,.55)}
+.card>header .copy:hover{background:rgba(255,255,255,.28)}
+.sec{margin:12px 14px 0;padding:14px 16px;background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:10px;animation:rise .3s ease-out both}
+.card .sec:nth-of-type(4n+2){border-left-color:var(--sage)}
+.card .sec:nth-of-type(4n+3){border-left-color:var(--green)}
+.card .sec:nth-of-type(4n+4){border-left-color:var(--terra)}
+.sec.warn{background:var(--gold-t);border-left-color:var(--terra)}
+.sec .hd{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:6px}
+.sec h3{margin:0;font:700 .98rem var(--serif);color:var(--green-d)}
+.sec.sa .body{font:1.6rem/1.75 var(--deva)}
+.sec.tr .body{font-style:italic;font-size:1.05rem}
+.copy{font-size:.78rem;font-weight:600;padding:4px 12px;border-radius:999px;cursor:pointer;background:var(--paper);color:var(--green-d);border:1px solid var(--line);transition:background .2s,border-color .2s;flex:none;min-height:28px}
+.copy:hover{background:var(--gold-t);border-color:var(--gold)}
+.body p{margin:0 0 .55em;overflow-wrap:anywhere}
 .body p:last-child{margin-bottom:0}
 .body ul{margin:.2em 0 .4em;padding-left:1.3em}
-.body li{margin:.25em 0}
-.sec.warn{background:var(--gold-t)}
-.plain{padding:20px 22px}
-.quiz .plain{font-size:1.05rem}
-.quiz .plain p{margin:0 0 .9em}
-.disclaimer{margin:0;padding:12px 22px;font-size:.85rem;color:var(--muted);background:var(--ivory);border-top:1px solid var(--line)}
+.body li{margin:.25em 0;overflow-wrap:anywhere}
+.plain{padding:14px 18px}
+.disclaimer{margin:12px 0 0;padding:0 18px;font-size:.8rem;color:var(--muted)}
 
-footer{margin-top:56px;padding:26px 0 36px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.9rem}
-footer p{margin:2px 0}
-footer .b{font-weight:600;color:var(--green)}
-@media(prefers-reduced-motion:reduce){*{transition:none!important;animation-duration:2.5s!important}}
+.qwrap{padding:12px 14px 0;display:grid;gap:12px}
+.q{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 16px;animation:rise .3s ease-out both}
+.qh{display:flex;gap:12px;align-items:flex-start}
+.qn{flex:none;width:30px;height:30px;border-radius:50%;background:var(--green);color:#fff;font:700 .9rem/30px var(--serif);text-align:center}
+.ql{display:block;font:700 .7rem var(--sans);letter-spacing:.1em;text-transform:uppercase;color:var(--terra)}
+.qt{margin:0;font:600 1.08rem/1.5 var(--serif);color:var(--green-d);overflow-wrap:anywhere}
+.opts{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.opt{display:flex;gap:10px;width:100%;text-align:left;font-size:1rem;color:var(--ink);background:var(--paper);border:1.5px solid var(--line);border-radius:9px;padding:9px 12px;cursor:pointer;overflow-wrap:anywhere;transition:background .2s,border-color .2s,transform .15s}
+.opt:hover{border-color:var(--gold);transform:translateX(2px)}
+.opt b{flex:none;width:1.4em;color:var(--gold)}
+.opt.sel{background:var(--gold-t);border-color:var(--gold)}
+.q:has(details[open]) .opt.ok{background:var(--sage-t);border-color:var(--green)}
+.q details{margin-top:12px}
+.q summary{cursor:pointer;font-weight:600;color:var(--green);font-size:.92rem;width:max-content;max-width:100%}
+.q .ans{margin-top:8px;padding:9px 14px;background:var(--sage-t);border-left:4px solid var(--green);border-radius:6px;overflow-wrap:anywhere}
+.q .exp{margin-top:6px;color:var(--muted);font-size:.93rem;overflow-wrap:anywhere}
+
+footer{margin-top:40px;padding:22px 0 30px;border-top:1px solid var(--line);text-align:center;color:var(--muted);font-size:.88rem;background:var(--ivory)}
+footer p{margin:2px 0}footer .b{font-weight:600;color:var(--green)}
+@media(max-width:520px){
+  .bar{padding:8px 14px}.sub{display:none}
+  .app{padding:0 14px}.panel{padding:16px 14px 18px}
+  .btn{flex:1 1 100%}.seg{display:grid;width:100%}.seg span{padding:10px 4px;white-space:normal}
+  .chip{padding:8px 16px}.opt{padding:11px 12px}
+}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition:none!important;animation:none!important}
+  .glyph{opacity:1}
+}
 </style>
 </head>
 <body>
 <a class="skip" href="#main">Skip to main content</a>
+<div class="glyphs" aria-hidden="true">
+  <span style="--x:4%;--y:14%;--s:6rem;--d:46s">अ</span><span style="--x:86%;--y:8%;--s:5rem;--d:52s">क</span>
+  <span style="--x:72%;--y:44%;--s:7rem;--d:60s">ऋ</span><span style="--x:9%;--y:52%;--s:5.5rem;--d:55s">म</span>
+  <span style="--x:90%;--y:76%;--s:6rem;--d:48s">आ</span><span style="--x:30%;--y:84%;--s:5rem;--d:58s">स</span>
+  <span style="--x:55%;--y:10%;--s:4.5rem;--d:50s">इ</span><span style="--x:48%;--y:66%;--s:5rem;--d:62s">उ</span>
+</div>
 
 <header class="top">
   <div class="wrap bar">
-    <div class="brand">🌿 Sanskrit Saathi</div>
-    <span class="badge">BAMS Sanskrit Study Companion</span>
+    <div><div class="brand">🪷 Sanskrit Saathi</div><div class="sub">Your Sanskrit study companion</div></div>
+    <span class="mode-ind" id="modeInd" role="status">🌿 General mode</span>
   </div>
 </header>
 
-<main id="main" class="wrap">
-  <section class="hero" aria-labelledby="hero-title">
-    <p class="tag">Your AI study companion for Sanskrit &amp; Ayurveda</p>
-    <h1 id="hero-title">Understand Sanskrit. Learn Ayurveda. Study smarter.</h1>
-    <p class="sub">An AI-powered Sanskrit learning companion designed for BAMS students.</p>
-  </section>
-
-  <section class="panel" aria-label="Sanskrit input">
-    <label class="field" for="text">Your Sanskrit text</label>
-    <textarea id="text" lang="sa" placeholder="Paste a Sanskrit word, sentence, or shloka here..." aria-describedby="count"></textarea>
-    <div class="meta"><span>Tip: press Ctrl + Enter to explain</span><span id="count" aria-live="off">0 characters</span></div>
-
-    <fieldset class="mode" aria-describedby="modeHelp">
-      <legend>Study mode</legend>
-      <div class="seg">
-        <label><input type="radio" name="study_mode" value="general" checked><span>🌿 General Sanskrit</span></label>
-        <label><input type="radio" name="study_mode" value="bams"><span>🪷 BAMS Sanskrit</span></label>
+<main id="main">
+  <div class="app" id="app">
+    <section class="composer" aria-label="Study space">
+      <div class="intro">
+        <p class="eyebrow">YOUR STUDY SPACE</p>
+        <h1>Learn Sanskrit, one verse at a time.</h1>
+        <p>Understand meaning, break down words, and practice with confidence.</p>
       </div>
-      <p class="help" id="modeHelp">Choose how Sanskrit Saathi should explain your text.</p>
-      <p class="bams-note" id="bamsNote" hidden>Focused on Sanskrit learning in a BAMS/Ayurveda study context.</p>
-    </fieldset>
 
-    <div class="actions">
-      <button type="button" id="explainBtn" class="btn primary">📖 Explain This</button>
-      <button type="button" id="quizBtn" class="btn secondary">🧠 Quiz Me</button>
-    </div>
+      <div class="panel">
+        <h2><label for="text"><b>✦</b> What are you studying today?</label></h2>
+        <textarea id="text" lang="sa" placeholder="Paste a Sanskrit word, sentence, or shloka..." aria-describedby="count tip"></textarea>
+        <div class="meta"><span id="tip">Ctrl + Enter to explain</span><span id="count">0 characters</span></div>
 
-    <div class="examples">
-      <h2 id="ex-h">Try an example</h2>
-      <div class="chips" role="group" aria-labelledby="ex-h">
-        <button type="button" class="chip" lang="sa" data-text="आयुः">आयुः</button>
-        <button type="button" class="chip" lang="sa" data-text="कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।">कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।</button>
+        <fieldset class="mode" aria-describedby="modeHelp">
+          <legend>Study mode</legend>
+          <div class="seg" data-mode="general">
+            <label><input type="radio" name="study_mode" value="general" checked><span>🌿 General Sanskrit</span></label>
+            <label><input type="radio" name="study_mode" value="bams"><span>🪷 BAMS Sanskrit</span></label>
+          </div>
+          <div class="row">
+            <p class="help" id="modeHelp">Choose how Sanskrit Saathi should explain your text.</p>
+            <span class="pill" id="bamsNote" hidden>BAMS context enabled</span>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="button" id="explainBtn" class="btn primary">📖 Explain</button>
+          <button type="button" id="quizBtn" class="btn secondary">🧠 Quiz me</button>
+        </div>
+
+        <div class="practice">
+          <h3 id="ex-h">Quick practice</h3>
+          <div class="chips" role="group" aria-labelledby="ex-h">
+            <button type="button" class="chip" lang="sa" data-text="आयुः">आयुः</button>
+            <button type="button" class="chip" lang="sa" data-text="शरीरम्">शरीरम्</button>
+            <button type="button" class="chip" lang="sa" data-text="धर्मः">धर्मः</button>
+            <button type="button" class="chip" lang="sa" data-text="सत्यं वद। धर्मं चर।">सत्यं वद। धर्मं चर।</button>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <div id="status" aria-live="polite"></div>
-  <div id="results"></div>
+    <div class="out">
+      <div id="status" aria-live="polite"></div>
+      <div id="results" aria-live="polite"></div>
+    </div>
+  </div>
 </main>
 
 <footer>
@@ -169,26 +243,32 @@ footer .b{font-weight:600;color:var(--green)}
       statusEl=document.getElementById("status"),
       resultsEl=document.getElementById("results"),
       explainBtn=document.getElementById("explainBtn"),
-      quizBtn=document.getElementById("quizBtn");
+      quizBtn=document.getElementById("quizBtn"),
+      bamsNote=document.getElementById("bamsNote"),
+      selectedStudyMode="general",
+      seg=document.querySelector(".seg"),
+      modeInd=document.getElementById("modeInd"),
+      app=document.getElementById("app");
 
-  var selectedStudyMode="general",
-      bamsNote=document.getElementById("bamsNote");
   document.querySelectorAll('input[name="study_mode"]').forEach(function(r){
     r.addEventListener("change",function(){
       if(r.checked){
         selectedStudyMode=(r.value==="bams")?"bams":"general";
-        bamsNote.hidden=selectedStudyMode!=="bams";
+        var b=selectedStudyMode==="bams";
+        bamsNote.hidden=!b;
+        seg.setAttribute("data-mode",selectedStudyMode);
+        modeInd.textContent=b?"🪷 BAMS mode":"🌿 General mode";
+        modeInd.className="mode-ind"+(b?" bams":"");
       }
     });
   });
-
   function updateCount(){
     var n=textEl.value.length;
     countEl.textContent=n+(n===1?" character":" characters");
   }
   textEl.addEventListener("input",updateCount);
   textEl.addEventListener("keydown",function(e){
-    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();explain();}
+    if((e.ctrlKey||e.metaKey)&&e.key==="Enter"){e.preventDefault();if(!explainBtn.disabled)run("explain");}
   });
   document.querySelectorAll(".chip").forEach(function(c){
     c.addEventListener("click",function(){
@@ -197,27 +277,27 @@ footer .b{font-weight:600;color:var(--green)}
     });
   });
 
-  /* ---------- small DOM helpers (text is always inserted as textContent) ---------- */
+  /* ---------- helpers (all text inserted via textContent) ---------- */
   function el(tag,cls,txt){
     var n=document.createElement(tag);
     if(cls)n.className=cls;
     if(txt!=null)n.textContent=txt;
     return n;
   }
-  function inline(parent,str){           // supports **bold** only
+  function inline(parent,str){
     str.split(/(\*\*[^*]+\*\*)/).forEach(function(p){
       if(!p)return;
       if(/^\*\*[^*]+\*\*$/.test(p))parent.appendChild(el("strong",null,p.slice(2,-2)));
       else parent.appendChild(document.createTextNode(p.replace(/\*\*/g,"")));
     });
   }
-  function renderBody(lines){            // paragraphs + simple bullet lists
+  function renderBody(lines){
     var box=el("div","body"),ul=null;
     lines.forEach(function(raw){
       var line=raw.replace(/\s+$/,"");
       if(!line.trim()){ul=null;return;}
-      var m=line.match(/^\s*(?:[-*•]|\d+[.)])\s+(.*)$/);
-      if(m&&/^\s*[-*•]/.test(line)){
+      var m=line.match(/^\s*[-*•]\s+(.*)$/);
+      if(m){
         if(!ul){ul=el("ul");box.appendChild(ul);}
         var li=el("li");inline(li,m[1]);ul.appendChild(li);
       }else{
@@ -227,47 +307,69 @@ footer .b{font-weight:600;color:var(--green)}
     });
     return box;
   }
-
-  /* ---------- explanation: safely parse obvious numbered sections ---------- */
-  var META=[
-    [/original|sanskrit text|devanagari/i,"📜"],
-    [/transliterat|roman|iast/i,"🔤"],
-    [/english/i,"🇬🇧"],
-    [/hindi|हिन्दी|हिंदी/i,"🇮🇳"],
-    [/word|breakdown|grammar/i,"🧩"],
-    [/context|usage|example|application/i,"📚"],
-    [/note|tip|caution|remember|learning/i,"⚠️"]
-  ];
-  function metaFor(title){
-    for(var i=0;i<META.length;i++)if(META[i][0].test(title))return META[i][1];
-    return "🌿";
-  }
-  function parseSections(text){
-    var head=/^\s*(?:#{1,4}\s*)?(?:\*\*)?\s*(\d{1,2})[.)]\s*(.+)$/;
-    var secs=[],cur=null,pre=[];
-    text.split(/\r?\n/).forEach(function(line){
-      var m=line.match(head);
-      if(m){
-        var rest=m[2].replace(/\*\*/g,"").trim(),title=rest,body="";
-        var ci=rest.indexOf(":");
-        if(ci>0&&ci<60){title=rest.slice(0,ci).trim();body=rest.slice(ci+1).trim();}
-        else if(rest.length>60){title="Section "+m[1];body=rest;}
-        cur={title:title.replace(/[:\s]+$/,""),lines:body?[body]:[]};
-        secs.push(cur);
-      }else if(cur)cur.lines.push(line);
-      else pre.push(line);
+  function copyBtn(label,getText){
+    var b=el("button","copy","Copy");
+    b.type="button";
+    b.setAttribute("aria-label","Copy "+label);
+    b.addEventListener("click",function(){
+      var t=getText();
+      function done(){b.textContent="Copied ✓";setTimeout(function(){b.textContent="Copy";},1500);}
+      function fallback(){
+        var ta=document.createElement("textarea");
+        ta.value=t;ta.style.cssText="position:fixed;opacity:0;top:0";
+        document.body.appendChild(ta);ta.select();
+        try{if(document.execCommand("copy"))done();}catch(e){}
+        document.body.removeChild(ta);
+      }
+      if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(t).then(done,fallback);
+      else fallback();
     });
-    return secs.length>=2?{secs:secs,pre:pre}:null;
+    return b;
   }
-
   function buildCard(cls,title,icon){
     var card=el("article","card "+cls);
     var h=el("header");h.appendChild(el("span",null,icon));h.appendChild(el("h2",null,title));
     card.appendChild(h);
     return card;
   }
+
+  /* ---------- explanation: style sections by their existing headings ---------- */
+  var META=[
+    [/original|sanskrit text|devanagari/i,"📜"],
+    [/transliterat|iast/i,"🔤"],
+    [/english/i,"🇬🇧"],
+    [/hindi|हिन्दी|हिंदी/i,"🇮🇳"],
+    [/word|breakdown/i,"🧩"],
+    [/context|usage/i,"📚"],
+    [/note|uncertain|caution|learning/i,"⚠️"]
+  ];
+  var KNOWN=/^(original|sanskrit|transliterat|iast|simple english|english|simple hindi|hindi|word[- ]by[- ]word|word breakdown|context|usage|important note|note|uncertaint|learning note)/i;
+  function metaFor(t){for(var i=0;i<META.length;i++)if(META[i][0].test(t))return META[i][1];return "🌿";}
+
+  function parseSections(text){
+    var secs=[],cur=null,pre=[];
+    text.split(/\r?\n/).forEach(function(line){
+      var numbered=/^\s*(?:#{1,4}\s*)?(?:\*\*)?\s*\d{1,2}[.)]\s*\S/.test(line),
+          hashed=/^\s*#{1,4}\s/.test(line),
+          clean=line.replace(/^\s*(?:#{1,4}\s*)?(?:[-*•]\s+)?(?:\*\*)?\s*(?:\d{1,2}[.)]\s*)?(?:\*\*)?\s*/,"").replace(/^[^\p{L}\p{N}]+/u,"").replace(/\*\*/g,"").trim(),
+          ci=clean.indexOf(":"),
+          title=(ci>0?clean.slice(0,ci):clean).replace(/[:\s]+$/,""),
+          rest=ci>0?clean.slice(ci+1).trim():"",
+          isHead=false;
+      if(clean&&title.length<60){
+        if(KNOWN.test(title))isHead=true;
+        else if((numbered||hashed)&&(ci>0||title.length<40))isHead=true;
+      }
+      if(isHead){cur={title:title,lines:rest?[rest]:[]};secs.push(cur);}
+      else if(cur)cur.lines.push(line);
+      else pre.push(line);
+    });
+    return secs.length>=2?{secs:secs,pre:pre}:null;
+  }
   function showExplanation(answer){
     var card=buildCard("explain","Explanation","📖");
+    card.firstChild.appendChild(el("span","ready","✓ Ready to study"));
+    card.firstChild.appendChild(copyBtn("full explanation",function(){return answer;}));
     var parsed=parseSections(answer);
     if(parsed){
       if(parsed.pre.join("").trim()){
@@ -275,12 +377,17 @@ footer .b{font-weight:600;color:var(--green)}
       }
       parsed.secs.forEach(function(s){
         if(!s.lines.join("").trim())return;
-        var sec=el("section","sec");
-        if(/original|sanskrit text|devanagari/i.test(s.title))sec.classList.add("sa");
-        if(/note|caution|learning/i.test(s.title))sec.classList.add("warn");
-        sec.appendChild(el("h3",null,metaFor(s.title)+" "+s.title));
+        var sec=el("section","sec"),isSa=/original|sanskrit/i.test(s.title),
+            isTr=/transliterat|iast/i.test(s.title);
+        if(isSa)sec.classList.add("sa");
+        if(isTr)sec.classList.add("tr");
+        if(/note|uncertaint|caution/i.test(s.title))sec.classList.add("warn");
+        var hd=el("div","hd");
+        hd.appendChild(el("h3",null,metaFor(s.title)+" "+s.title));
+        if(isSa||isTr)hd.appendChild(copyBtn(s.title,function(){return s.lines.join("\n").replace(/\*\*/g,"").trim();}));
+        sec.appendChild(hd);
         var body=renderBody(s.lines);
-        if(sec.classList.contains("sa"))body.setAttribute("lang","sa");
+        if(isSa)body.setAttribute("lang","sa");
         sec.appendChild(body);
         card.appendChild(sec);
       });
@@ -290,10 +397,72 @@ footer .b{font-weight:600;color:var(--green)}
     card.appendChild(el("p","disclaimer","Sanskrit Saathi is a language-learning aid. Check important meanings with your textbook or teacher."));
     return card;
   }
+
+  /* ---------- quiz: detect questions/options, else fall back to raw text ---------- */
+  function parseQuiz(text){
+    var qs=[],cur=null,field=null,intro=[];
+    text.split(/\r?\n/).forEach(function(raw){
+      var line=raw.replace(/\*\*/g,"").replace(/^\s*#{1,4}\s*/,"").trim(),m;
+      if(!line)return;
+      if(cur&&(m=line.match(/^(?:[-*]\s*)?\(?([A-Da-d])[.)]\s+(.+)$/))){cur.opts.push({k:m[1].toUpperCase(),t:m[2]});field="opt";return;}
+      if(cur&&(m=line.match(/^(?:[-*]\s*)?(?:Correct\s+)?Answer\s*:?\s*(.*)$/i))){cur.ans=m[1];field="ans";return;}
+      if(cur&&(m=line.match(/^(?:[-*]\s*)?Explanation\s*:?\s*(.*)$/i))){cur.exp=m[1];field="exp";return;}
+      if((m=line.match(/^(?:Q(?:uestion)?\s*)?(\d{1,2})\s*[.):]\s*(.*)$/i))){cur={n:m[1],q:m[2],opts:[],ans:"",exp:""};qs.push(cur);field="q";return;}
+      if(!cur){intro.push(line);return;}
+      if(field==="opt")cur.opts[cur.opts.length-1].t+=" "+line;
+      else if(field==="ans")cur.ans+=" "+line;
+      else if(field==="exp")cur.exp+=" "+line;
+      else cur.q+=" "+line;
+    });
+    var ok=qs.length>0&&qs.every(function(q){return q.q.trim()&&q.opts.length>=2;});
+    return ok?{qs:qs,intro:intro}:null;
+  }
   function showQuiz(quiz){
     var card=buildCard("quiz","Sanskrit Quiz","🧠");
-    var plain=el("div","plain");plain.appendChild(renderBody(quiz.split(/\r?\n/)));
-    card.appendChild(plain);
+    var head=card.firstChild;
+    head.appendChild(el("span","ready","✓ Practice ready"));
+    head.appendChild(copyBtn("quiz",function(){return quiz;}));
+    var wrap=el("div","qwrap"),parsed=parseQuiz(quiz);
+    if(!parsed){
+      var plain=el("div","plain");plain.appendChild(renderBody(quiz.split(/\r?\n/)));
+      card.appendChild(plain);return card;
+    }
+    var toggle=el("button","copy","Show all answers");toggle.type="button";
+    var all=false;
+    toggle.addEventListener("click",function(){
+      all=!all;
+      card.querySelectorAll(".q details").forEach(function(d){d.open=all;});
+      toggle.textContent=all?"Hide answers":"Show all answers";
+    });
+    head.appendChild(toggle);
+    if(parsed.intro.length)wrap.appendChild(renderBody(parsed.intro));
+    parsed.qs.forEach(function(q){
+      var art=el("article","q"),qh=el("div","qh");
+      qh.appendChild(el("span","qn",q.n));
+      var qb=el("div","qb");qb.appendChild(el("span","ql","Question "+q.n));qb.appendChild(el("p","qt",q.q.trim()));qh.appendChild(qb);
+      art.appendChild(qh);
+      var letter=(q.ans.match(/^\(?([A-Da-d])\b/)||[])[1];
+      var ul=el("ul","opts");
+      q.opts.forEach(function(o){
+        var li=el("li"),bt=el("button","opt"+(letter&&letter.toUpperCase()===o.k?" ok":""));
+        bt.type="button";bt.setAttribute("aria-pressed","false");
+        bt.appendChild(el("b",null,o.k));bt.appendChild(el("span",null,o.t));
+        bt.addEventListener("click",function(){
+          ul.querySelectorAll(".opt").forEach(function(x){x.classList.remove("sel");x.setAttribute("aria-pressed","false");});
+          bt.classList.add("sel");bt.setAttribute("aria-pressed","true");
+        });
+        li.appendChild(bt);ul.appendChild(li);
+      });
+      art.appendChild(ul);
+      if(q.ans||q.exp){
+        var d=el("details");d.appendChild(el("summary",null,"Show answer"));
+        if(q.ans){var a=el("div","ans");a.appendChild(el("strong",null,"Correct answer: "));a.appendChild(document.createTextNode(q.ans.trim()));d.appendChild(a);}
+        if(q.exp){var x=el("div","exp");x.appendChild(el("strong",null,"Explanation: "));x.appendChild(document.createTextNode(q.exp.trim()));d.appendChild(x);}
+        art.appendChild(d);
+      }
+      wrap.appendChild(art);
+    });
+    card.appendChild(wrap);
     return card;
   }
 
@@ -306,8 +475,11 @@ footer .b{font-weight:600;color:var(--green)}
   function showLoading(title,sub){
     statusEl.textContent="";
     var box=el("div","loading");box.setAttribute("role","status");
-    box.appendChild(el("div","spin"));
+    var g=el("div","glyph","अ");g.setAttribute("aria-hidden","true");box.appendChild(g);
     var t=el("div");t.appendChild(el("strong",null,title));t.appendChild(el("span",null,sub));
+    var dt=el("span","dots");dt.setAttribute("aria-hidden","true");
+    for(var i=0;i<3;i++)dt.appendChild(el("i"));
+    t.appendChild(dt);
     box.appendChild(t);statusEl.appendChild(box);
   }
   function showError(msg){
@@ -328,8 +500,8 @@ footer .b{font-weight:600;color:var(--green)}
     var isExplain=kind==="explain";
     setBusy(true,kind);
     resultsEl.textContent="";
-    if(isExplain)showLoading("🌿 Sanskrit Saathi is thinking...","Your local AI is preparing your explanation.");
-    else showLoading("🧠 Creating your Sanskrit quiz...","Your local AI is writing questions from your text.");
+    if(isExplain)showLoading("🌿 Understanding your Sanskrit...","Your local AI is preparing your explanation.");
+    else showLoading("🧠 Preparing your practice...","Your local AI is writing questions from your text.");
 
     fetch(isExplain?"/api/explain":"/api/quiz",{
       method:"POST",
@@ -346,6 +518,8 @@ footer .b{font-weight:600;color:var(--green)}
       statusEl.textContent="";
       var card=isExplain?showExplanation(out):showQuiz(out);
       resultsEl.appendChild(card);
+      app.classList.add("has-results");
+      card.querySelectorAll(".sec,.q").forEach(function(n,i){n.style.animationDelay=Math.min(i,8)*45+"ms";});
       card.scrollIntoView({behavior:"smooth",block:"start"});
     })
     .catch(function(err){
@@ -354,7 +528,6 @@ footer .b{font-weight:600;color:var(--green)}
     })
     .then(function(){setBusy(false);});
   }
-  function explain(){if(!explainBtn.disabled)run("explain");}
   explainBtn.addEventListener("click",function(){run("explain");});
   quizBtn.addEventListener("click",function(){run("quiz");});
   updateCount();
