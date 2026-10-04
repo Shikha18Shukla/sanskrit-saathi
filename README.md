@@ -151,10 +151,6 @@ ollama pull gemma3:4b
 python app.py
 ```
 
-### 7️⃣ Open the app
-
-👉 **http://127.0.0.1:5000**
-
 > 💡 Responses can take a little while on a CPU-only machine, because the AI runs locally. The loading card shows that it's working.
 
 ---
